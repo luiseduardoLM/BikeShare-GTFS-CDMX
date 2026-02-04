@@ -59,30 +59,18 @@ def geocode(address):
         return (location.latitude, location.longitude)  # Return the latitude and longitude
 
 # Define the function to get bike availability near a location
-def get_bike_availability(latlon, df, input_bike_modes):
+def get_bike_availability(latlon, df):
     """Calculate distance from each station to the user and return a single station id, lat, lon"""
-    if len(input_bike_modes) == 0 or len(input_bike_modes) == 2:  # If no mode selected, assume both bikes are selected
-        i = 0
-        df['distance'] = ''
-        while i < len(df):
-            df.loc[i, 'distance'] = geodesic(latlon, (df['lat'][i], df['lon'][i])).km  # Calculate distance to each station
-            i = i + 1
-        df = df.loc[(df['ebike'] > 0) | (df['mechanical'] > 0)]  # Remove stations with no available bikes
-        chosen_station = []
-        chosen_station.append(df[df['distance'] == min(df['distance'])]['station_id'].iloc[0])  # Get closest station
-        chosen_station.append(df[df['distance'] == min(df['distance'])]['lat'].iloc[0])
-        chosen_station.append(df[df['distance'] == min(df['distance'])]['lon'].iloc[0])
-    else:
-        i = 0
-        df['distance'] = ''
-        while i < len(df):
-            df.loc[i, 'distance'] = geodesic(latlon, (df['lat'][i], df['lon'][i])).km  # Calculate distance to each station
-            i = i + 1
-        df = df.loc[df[input_bike_modes[0]] > 0]  # Remove stations without the selected mode available
-        chosen_station = []
-        chosen_station.append(df[df['distance'] == min(df['distance'])]['station_id'].iloc[0])  # Get closest station
-        chosen_station.append(df[df['distance'] == min(df['distance'])]['lat'].iloc[0])
-        chosen_station.append(df[df['distance'] == min(df['distance'])]['lon'].iloc[0])
+    i = 0
+    df['distance'] = ''
+    while i < len(df):
+        df.loc[i, 'distance'] = geodesic(latlon, (df['lat'][i], df['lon'][i])).km  # Calculate distance to each station
+        i = i + 1
+    df = df.loc[(df["num_bikes_available"]> 0)]  # Remove stations with no available bikes
+    chosen_station = []
+    chosen_station.append(df[df['distance'] == min(df['distance'])]['station_id'].iloc[0])  # Get closest station
+    chosen_station.append(df[df['distance'] == min(df['distance'])]['lat'].iloc[0])
+    chosen_station.append(df[df['distance'] == min(df['distance'])]['lon'].iloc[0])
     return chosen_station  # Return the chosen station
 
 # Define the function to get dock availability near a location
